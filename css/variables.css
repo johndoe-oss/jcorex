@@ -1,0 +1,59 @@
+/* ========================================
+   JCoreX - CSS Variables (Shared Theme)
+   Import this file in all CSS files
+   ======================================== */
+
+:root {
+  /* Background colors */
+  --bg: #08080d;
+  --surf: #0f0f17;
+  --surf2: #16161f;
+  --surf3: #1e1e2a;
+  
+  /* Border colors */
+  --bdr: #252535;
+  --bdr2: #2e2e42;
+  
+  /* Accent colors */
+  --gold: #c9a84c;
+  --gold2: #f0cc7a;
+  --rose: #e05c7a;
+  --teal: #3ecfb0;
+  
+  /* Text colors */
+  --txt: #eeeef5;
+  --txt2: #8888a8;
+  --txt3: #44445a;
+  
+  /* Common properties */
+  --r: 10px;
+  --shadow: 0 20px 60px rgba(0,0,0,.6);
+  
+  /* Spacing (Issue #10 - Magic Numbers) */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 12px;
+  --spacing-lg: 16px;
+  --spacing-xl: 22px;
+  --spacing-xxl: 28px;
+  
+  /* Typography */
+  --font-sans: 'Instrument Sans', sans-serif;
+  --font-serif: 'Fraunces', serif;
+  
+  /* Border radius */
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 10px;
+  
+  /* Transitions */
+  --transition-fast: 0.18s;
+  --transition-normal: 0.2s;
+  --transition-slow: 0.5s;
+  
+  /* Z-index layers */
+  --z-base: 1;
+  --z-dropdown: 10;
+  --z-modal: 50;
+  --z-toast: 100;
+}
