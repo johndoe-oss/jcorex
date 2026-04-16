@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="JCoreX - Free professional resume builder. Create stunning resumes with multiple templates, export to PDF, and share via link.">
+  <meta name="keywords" content="resume builder, CV maker, professional resume, free resume generator, job application">
+  <meta name="author" content="JCoreX">
+  <meta name="robots" content="index, follow">
+  
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="JCoreX — Free Professional Resume Builder">
+  <meta property="og:description" content="Create stunning professional resumes in minutes. Multiple templates, PDF export, and easy sharing.">
+  <meta property="og:image" content="https://jcorex.app/preview.png">
+  <meta property="og:url" content="https://jcorex.app">
+  
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="JCoreX — Free Professional Resume Builder">
+  <meta name="twitter:description" content="Create stunning professional resumes in minutes. Multiple templates, PDF export, and easy sharing.">
+  <meta name="twitter:image" content="https://jcorex.app/preview.png">
+  
+  <title>JCoreX — Resume Builder</title>
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,600;0,700;1,400&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</head>
+<body>
+
+<header>
+  <div class="logo"><div class="logo-badge">J</div>J<em>Core</em>X</div>
+  <div class="hdr-right">
+    <button class="btn btn-ghost" onclick="JCoreX.openShare()" aria-label="Share resume as link">🔗 Share Link</button>
+    <button class="btn btn-gold" onclick="JCoreX.downloadPDF()" aria-label="Export resume as PDF">⬇ Export PDF</button>
+    <div id="authSection" style="display:none; display: flex; gap: 10px; align-items: center;">
+      <a href="pricing.html" class="btn btn-ghost">⭐ Upgrade</a>
+      <button class="btn btn-ghost" onclick="logout()" aria-label="Sign out">🚪 Sign Out</button>
+    </div>
+    <div id="noAuthSection">
+      <a href="auth.html" class="btn btn-ghost" aria-label="Sign in">🔑 Sign In</a>
+    </div>
+  </div>
+</header>
+
+<script>
+// Handle auth sections visibility
+function updateAuthUI() {
+  const token = localStorage.getItem('jcorex_token');
+  const authSection = document.getElementById('authSection');
+  const noAuthSection = document.getElementById('noAuthSection');
+  
+  if (token) {
+    authSection.style.display = 'flex';
+    noAuthSection.style.display = 'none';
+  } else {
+    authSection.style.display = 'none';
+    noAuthSection.style.display = 'block';
+  }
+}
+
+function logout() {
+  localStorage.removeItem('jcorex_token');
+  localStorage.removeItem('jcorex_user');
+  localStorage.removeItem('jcorex_last_resume_id');
+  window.location.href = 'index.html';
+}
+
+document.addEventListener('DOMContentLoaded', updateAuthUI);
+</script>
+
+<div class="app">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="tabs" role="tablist" aria-label="Resume sections">
+      <button class="tab active" onclick="JCoreX.stab('info',this)" role="tab" aria-selected="true" aria-controls="p-info" id="tab-info"><span class="ti" aria-hidden="true">👤</span><span>Info</span></button>
+      <button class="tab" onclick="JCoreX.stab('work',this)" role="tab" aria-selected="false" aria-controls="p-work" id="tab-work"><span class="ti" aria-hidden="true">💼</span><span>Work</span></button>
+      <button class="tab" onclick="JCoreX.stab('edu',this)" role="tab" aria-selected="false" aria-controls="p-edu" id="tab-edu"><span class="ti" aria-hidden="true">🎓</span><span>Edu</span></button>
+      <button class="tab" onclick="JCoreX.stab('skills',this)" role="tab" aria-selected="false" aria-controls="p-skills" id="tab-skills"><span class="ti" aria-hidden="true">⚡</span><span>Skills</span></button>
+      <button class="tab" onclick="JCoreX.stab('design',this)" role="tab" aria-selected="false" aria-controls="p-design" id="tab-design"><span class="ti" aria-hidden="true">🎨</span><span>Design</span></button>
+    </div>
+    <div class="prog" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="Resume completion"><div class="prog-fill" id="prog"></div></div>
+    <div class="sb">
+
+      <!-- INFO -->
+      <div class="panel active" id="p-info" role="tabpanel" aria-labelledby="tab-info">
+        <div class="slabel">Profile Photo</div>
+        <div class="field">
+          <label class="img-upload" for="i-photo">
+            <input type="file" id="i-photo" accept="image/*" onchange="JCoreX.handlePhoto(this)" aria-describedby="photo-hint">
+            <span class="img-preview" id="img-preview">
+              <span class="img-placeholder">📷 Choose Photo</span>
+            </span>
+          </label>
+          <span id="photo-hint" class="hint">JPEG, PNG, GIF, WebP (max 2MB)</span>
+        </div>
+        <div class="slabel">Personal</div>
+        <div class="field"><label for="i-name">Full Name</label><input id="i-name" placeholder="e.g. Jordan Cole" oninput="JCoreX.handleInput('i-name', this.value)"></div>
+        <div class="field"><label for="i-role">Job Title</label><input id="i-role" placeholder="e.g. Senior UX Designer" oninput="JCoreX.handleInput('i-role', this.value)"></div>
+        <div class="field"><label for="i-sum">Professional Summary</label><textarea id="i-sum" placeholder="2–3 sentences that capture who you are professionally…" oninput="JCoreX.handleInput('i-sum', this.value)"></textarea></div>
+        <div class="slabel">Contact</div>
+        <div class="r2">
+          <div class="field"><label for="i-em">Email</label><input id="i-em" type="email" placeholder="you@email.com" oninput="JCoreX.handleInput('i-em', this.value)" aria-describedby="email-hint"></div>
+          <div class="field"><label for="i-ph">Phone</label><input id="i-ph" type="tel" placeholder="+233 55 000 1234" oninput="JCoreX.handleInput('i-ph', this.value)"></div>
+        </div>
+        <span id="email-hint" class="hint">We'll validate the email format</span>
+        <div class="r2">
+          <div class="field"><label for="i-loc">Location</label><input id="i-loc" placeholder="Accra, Ghana" oninput="JCoreX.handleInput('i-loc', this.value)"></div>
+          <div class="field"><label for="i-web">Website</label><input id="i-web" type="url" placeholder="yoursite.com" oninput="JCoreX.handleInput('i-web', this.value)"></div>
+        </div>
+        <div class="field"><label for="i-li">LinkedIn</label><input id="i-li" type="url" placeholder="linkedin.com/in/you" oninput="JCoreX.handleInput('i-li', this.value)"></div>
+      </div>
+
+      <!-- WORK -->
+      <div class="panel" id="p-work" role="tabpanel" aria-labelledby="tab-work">
+        <div class="slabel">Work Experience</div>
+        <div id="wlist" aria-label="Work experience entries"></div>
+        <button class="add-btn" onclick="JCoreX.addWork()" aria-label="Add new work experience">＋ Add Position</button>
+      </div>
+
+      <!-- EDU -->
+      <div class="panel" id="p-edu" role="tabpanel" aria-labelledby="tab-edu">
+        <div class="slabel">Education</div>
+        <div id="elist" aria-label="Education entries"></div>
+        <button class="add-btn" onclick="JCoreX.addEdu()" aria-label="Add new education">＋ Add Education</button>
+      </div>
+
+      <!-- SKILLS -->
+      <div class="panel" id="p-skills" role="tabpanel" aria-labelledby="tab-skills">
+        <div class="slabel">Skills</div>
+        <div class="sk-row">
+          <div class="field"><label for="sk-in" class="visually-hidden">Add a skill</label><input id="sk-in" placeholder="e.g. Figma, React, Python…" onkeydown="if(event.key==='Enter')JCoreX.addSkill()"></div>
+          <button class="btn btn-gold" onclick="JCoreX.addSkill()" style="padding:7px 13px;height:35px;flex-shrink:0;align-self:flex-end;margin-bottom:12px;">Add</button>
+        </div>
+        <div class="tags" id="sk-tags" role="list" aria-label="Skills list"></div>
+        <div class="slabel" style="margin-top:22px;">Languages</div>
+        <div class="sk-row">
+          <div class="field"><label for="lg-in" class="visually-hidden">Add a language</label><input id="lg-in" placeholder="e.g. English (Native)…" onkeydown="if(event.key==='Enter')JCoreX.addLang()"></div>
+          <button class="btn btn-gold" onclick="JCoreX.addLang()" style="padding:7px 13px;height:35px;flex-shrink:0;align-self:flex-end;margin-bottom:12px;">Add</button>
+        </div>
+        <div class="tags" id="lg-tags" role="list" aria-label="Languages list"></div>
+      </div>
+
+      <!-- DESIGN -->
+      <div class="panel" id="p-design" role="tabpanel" aria-labelledby="tab-design">
+        <div class="slabel">Template</div>
+        <div class="tg" role="radiogroup" aria-label="Resume template selection">
+          <div class="tc sel" onclick="JCoreX.setT('classic',this)" role="radio" aria-checked="true" tabindex="0"><div class="tt" style="background:#e8eaf6;">🏛️</div><div class="tn">Classic</div></div>
+          <div class="tc" onclick="JCoreX.setT('modern',this)" role="radio" aria-checked="false" tabindex="0"><div class="tt" style="background:#e0f7fa;">✨</div><div class="tn">Modern</div></div>
+          <div class="tc" onclick="JCoreX.setT('creative',this)" role="radio" aria-checked="false" tabindex="0"><div class="tt" style="background:#fff0f3;">🎨</div><div class="tn">Creative</div></div>
+        </div>
+        <div class="slabel" style="margin-top:22px;">Accent Color</div>
+        <div class="sw-row" id="swatches" role="radiogroup" aria-label="Accent color selection">
+          <div class="sw sel" style="background:#1a237e;" data-c="#1a237e" onclick="JCoreX.setC(this)" role="radio" aria-checked="true" tabindex="0"></div>
+          <div class="sw" style="background:#00838f;" data-c="#00838f" onclick="JCoreX.setC(this)" role="radio" aria-checked="false" tabindex="0"></div>
+          <div class="sw" style="background:#c62828;" data-c="#c62828" onclick="JCoreX.setC(this)" role="radio" aria-checked="false" tabindex="0"></div>
+          <div class="sw" style="background:#2e7d32;" data-c="#2e7d32" onclick="JCoreX.setC(this)" role="radio" aria-checked="false" tabindex="0"></div>
+          <div class="sw" style="background:#e05c7a;" data-c="#e05c7a" onclick="JCoreX.setC(this)" role="radio" aria-checked="false" tabindex="0"></div>
+          <div class="sw" style="background:#6a1b9a;" data-c="#6a1b9a" onclick="JCoreX.setC(this)" role="radio" aria-checked="false" tabindex="0"></div>
+          <div class="sw" style="background:#bf360c;" data-c="#bf360c" onclick="JCoreX.setC(this)" role="radio" aria-checked="false" tabindex="0"></div>
+          <div class="sw" style="background:#212121;" data-c="#212121" onclick="JCoreX.setC(this)" role="radio" aria-checked="false" tabindex="0"></div>
+        </div>
+        <div class="hint" style="margin-top:8px;">Applies to header, borders & accent elements</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- PREVIEW -->
+  <div class="preview">
+    <div class="pbar">
+      <div class="live-lbl"><div class="dot" aria-hidden="true"></div>Live Preview</div>
+      <button class="btn btn-ghost" onclick="JCoreX.downloadPDF()" style="font-size:11.5px;padding:5px 12px;" aria-label="Download PDF">🖨 Download PDF</button>
+    </div>
+    <div class="pscroll"><div id="cv" class="t-classic" role="region" aria-label="Resume preview"></div></div>
+  </div>
+</div>
+
+<!-- SHARE MODAL -->
+<div class="overlay" id="share-modal" role="dialog" aria-modal="true" aria-labelledby="share-title">
+  <div class="modal">
+    <h2 id="share-title">🔗 Share Your Resume</h2>
+    <p>Your resume is encoded into a URL. Send this link — anyone can view your resume exactly as built.</p>
+    <div class="modal-row">
+      <label for="share-url" class="visually-hidden">Share URL</label>
+      <input class="minput" id="share-url" readonly aria-describedby="share-hint">
+      <button class="btn btn-gold" onclick="JCoreX.copyLink()">Copy</button>
+    </div>
+    <div class="hint" style="margin-top:8px;" id="share-hint">The link reflects your current resume state. Link expires in 24 hours.</div>
+    <div class="modal-actions"><button class="btn btn-ghost" onclick="JCoreX.closeM()">Close</button></div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<!-- Landscape Mode Notification -->
+<div id="landscape-notice" class="landscape-notice" role="status" aria-live="polite">
+  <span class="landscape-icon">📱</span>
+  <span class="landscape-text">For the best experience, please rotate your device to landscape mode</span>
+</div>
+
+<!-- Auto-save indicator (hidden by default) -->
+<div id="auto-save-indicator" class="auto-save-indicator" role="status" aria-live="polite" aria-hidden="true"></div>
+
+<script src="js/app.js"></script>
+<script>
+  // Initialize orientation detection
+  if (window.JCoreX) {
+    window.JCoreX.checkOrientation();
+    window.addEventListener('orientationchange', function() {
+      setTimeout(function() {
+        window.JCoreX.checkOrientation();
+      }, 100);
+    });
+    window.addEventListener('resize', function() {
+      window.JCoreX.checkOrientation();
+    });
+  }
+</script>
+</body>
+</html>
